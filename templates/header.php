@@ -3,5 +3,5 @@
         <img src="/img/logo.svg" alt="Fashion">
     </a>
 
-    <?php \controllers\ext\root\showMenu('page-header__menu', 'main-menu main-menu--header')?>
+    <?php \ext\showMenu($menu, 'page-header__menu', 'main-menu main-menu--header')?>
 </header>

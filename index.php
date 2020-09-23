@@ -3,20 +3,30 @@
     require $_SERVER['DOCUMENT_ROOT'] . '/include/constants.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/include/db.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/include/functions.php';
+    require $_SERVER['DOCUMENT_ROOT'] . '/routes.php';
 
-    $urlParts = array_values(array_filter(explode('/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)), function($elm){ return !empty($elm); }));
+    $route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $urlParts = array_values(array_filter(explode('/', $route), function($elm){ return !empty($elm); }));
+    $params = array_slice($urlParts, 1);
 
-    if (empty($_GET['part'])) {
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/rootHeader.php';
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
-    }
+    $route = substr($route, -1) === '/' ? substr_replace($route, '', -1) : $route;
+    $controllerData = array_filter(getRouteMapping(), function ($value) use ($route) {
+        static $flag = false;
+        if (!$flag && preg_match($value['match'], $route) > 0) {
+            $flag = true;
+            return true;
+        }
+        return false;
+    });
 
-    $controller = $urlParts[0] ?? 'goods';
+    if (empty($controllerData)) {
+        \ext\redirectTo('/');
+    } else {
+        $controllerData = array_shift($controllerData);
+        $controllerFullFilePath = $_SERVER['DOCUMENT_ROOT'] . $controllerData['path'] . $controllerData['name'] . '.php';
+        require $controllerFullFilePath;
 
-    require $_SERVER['DOCUMENT_ROOT'] . "/include/controllers/${controller}.php";
-    call_user_func("\\controllers\\${controller}\\show", array_slice($urlParts, 1));
-
-    if (empty($_GET['part'])) {
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/footer.php';
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/rootFooter.php';
+        $controllerClass = '\controllers\\' . ucfirst(strtolower($controllerData['name']));
+        $controller = new $controllerClass();
+        $controller -> execute(array_slice($urlParts, 1));
     }

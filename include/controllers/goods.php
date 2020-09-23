@@ -1,77 +1,81 @@
 <?php
-namespace controllers\goods;
+namespace controllers;
 
+require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/goods.php';
 
-function setGoodsGroup($groupId)
+final class Goods extends BaseController
 {
-    $_GET['cat'] = $groupId;
-}
+    protected function showContent($params)
+    {
+        $this -> setGoodsGroup(htmlspecialchars($params[0] ?? 'all'));
 
-function getGoodsGroupId()
-{
-    return $_GET['cat'];
-}
-
-function createGoodsFilterFromUrl(): array
-{
-    $groups[] = isset($_GET['cat']) ? htmlspecialchars($_GET['cat']) : 'all';
-    if (isset($_GET['checked'])) {
-        $groups = array_merge($groups, explode('%',htmlspecialchars($_GET['checked'])));
+        if (!empty($_GET['part'])){
+            self::showGoods();
+        } else {
+            require $_SERVER['DOCUMENT_ROOT'] . '/templates/main.php';
+        }
     }
 
-    return [
-        'isActive' => true,
-        'groups' => array_unique($groups),
-        'minPrice' => isset($_GET['min-price']) ? floatval(htmlspecialchars($_GET['min-price'])) : 0,
-        'maxPrice' => isset($_GET['max-price']) ? floatval(htmlspecialchars($_GET['max-price'])) : 9999999999999999,
-        'sorting' =>[
-            'sort' => isset($_GET['sort']) ? htmlspecialchars($_GET['sort']) : null,
-            'direction' => isset($_GET['direction']) ? htmlspecialchars($_GET['direction']) : null
-        ],
-        'page' => intval(isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 1)
-    ];
-}
+    private static function setGoodsGroup($groupId)
+    {
+        $_GET['cat'] = $groupId;
+    }
 
-function showGoods()
-{
-    $filters = createGoodsFilterFromUrl();
-    $goods =\dataAccess\goods\getGoods($filters);
-    $allCount = isset($goods[0]) ? $goods[0]['count'] : 0;
+    private static function getGoodsGroupId()
+    {
+        return $_GET['cat'];
+    }
 
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goods.php';
-}
+    public static function createGoodsFilterFromUrl(): array
+    {
+        $groups[] = isset($_GET['cat']) ? htmlspecialchars($_GET['cat']) : 'all';
+        if (isset($_GET['checked'])) {
+            $groups = array_merge($groups, explode('%', htmlspecialchars($_GET['checked'])));
+        }
 
-function showFilters()
-{
-    $filters = \dataAccess\goods\getFilters(getGoodsGroupId());
+        return [
+            'isActive' => true,
+            'groups' => array_unique($groups),
+            'minPrice' => isset($_GET['min-price']) ? floatval(htmlspecialchars($_GET['min-price'])) : 0,
+            'maxPrice' => isset($_GET['max-price']) ? floatval(htmlspecialchars($_GET['max-price'])) : 9999999999999999,
+            'sorting' => [
+                'sort' => isset($_GET['sort']) ? htmlspecialchars($_GET['sort']) : null,
+                'direction' => isset($_GET['direction']) ? htmlspecialchars($_GET['direction']) : null
+            ],
+            'page' => intval(isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 1)
+        ];
+    }
 
-    $getFilterCallback = function($filterType) {
-        return function($value) use ($filterType) {
-            return $value['type'] === $filterType;
+    public static function showGoods()
+    {
+        $filters = self::createGoodsFilterFromUrl();
+        $goods =\dataAccess\goods\getGoods($filters);
+        $allCount = isset($goods[0]) ? $goods[0]['count'] : 0;
+
+        require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goods.php';
+    }
+
+    public static function showFilters()
+    {
+        $filters = \dataAccess\goods\getFilters(self::getGoodsGroupId());
+
+        $getFilterCallback = function($filterType) {
+            return function($value) use ($filterType) {
+                return $value['type'] === $filterType;
+            };
         };
-    };
 
-    $categoryFilters = array_filter($filters, $getFilterCallback('category'));
-    $rangeFilters = array_filter($filters, $getFilterCallback('range'));
-    $checkedFilters = array_filter($filters, $getFilterCallback('checked'));
+        $categoryFilters = array_filter($filters, $getFilterCallback('category'));
+        $rangeFilters = array_filter($filters, $getFilterCallback('range'));
+        $checkedFilters = array_filter($filters, $getFilterCallback('checked'));
 
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goodFilters.php';
-}
-
-function show($urlPathArray)
-{
-    setGoodsGroup(htmlspecialchars($urlPathArray[0] ?? 'all'));
-
-    if (!empty($_GET['part'])){
-        showGoods();
-    } else {
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/main.php';
+        require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goodFilters.php';
     }
-}
 
-function showSorting($allCount, $filters)
-{
-    $sorting = \dataAccess\goods\getSorting();
-    require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goodSorting.php';
+    public static function showSorting($allCount, $filters)
+    {
+        $sorting = \dataAccess\goods\getSorting();
+        require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goodSorting.php';
+    }
 }

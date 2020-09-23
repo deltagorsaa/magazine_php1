@@ -1,15 +1,19 @@
 <?php
-namespace controllers\delivery;
+namespace controllers;
 require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/delivery.php';
+require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
 
-function show($urlPathArray)
+final class Delivery extends BaseController
 {
-    if (($urlPathArray[0] ?? null) === 'office'){
-        $deliveryOfficeDefault = \dataAccess\delivery\getDeliveryOffice(intval(explode('delivery_office_', $_GET['id'])[1]));
-        $daysInfo = \dataAccess\delivery\getPreDaysData($deliveryOfficeDefault);
+    protected function showContent($params)
+    {
+        if (($params[0] ?? null) === 'office'){
+            $deliveryOfficeDefault = \dataAccess\delivery\getDeliveryOffice(intval(explode('delivery_office_', $_GET['id'])[1]));
+            $daysInfo = \dataAccess\delivery\getPreDaysData($deliveryOfficeDefault);
 
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/orders/deliveryShop.php';
-    } else {
-        require $_SERVER['DOCUMENT_ROOT'] . '/templates/delivery.php';
+            require $_SERVER['DOCUMENT_ROOT'] . '/templates/orders/deliveryShop.php';
+        } else {
+            require $_SERVER['DOCUMENT_ROOT'] . '/templates/delivery.php';
+        }
     }
 }

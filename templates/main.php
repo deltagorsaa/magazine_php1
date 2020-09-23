@@ -1,5 +1,5 @@
 <?php
-    require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/orders.php';
+require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/orders.php';
 ?>
 <main class="shop-page">
     <header class="intro">
@@ -9,8 +9,8 @@
         </div>
     </header>
     <section class="shop container">
-        <?php \controllers\goods\showFilters()?>
-        <?php \controllers\goods\showGoods()?>
+        <?php self::showFilters()?>
+        <?php self::showGoods()?>
     </section>
-    <?php \controllers\orders\showCreateOrder()?>
+    <?php \controllers\Order::showOrder()?>
 </main>

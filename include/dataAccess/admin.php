@@ -1,7 +1,7 @@
 <?php
-namespace dataAccess\root;
+namespace dataAccess\admin;
 
-function getMenu(): array
+function getAdminMenu(): array
 {
     return [
         [
@@ -22,3 +22,4 @@ function getMenu(): array
         ]
     ];
 }
+

@@ -1,5 +1,5 @@
 <div class="shop__wrapper">
-   <?php \controllers\goods\showSorting($allCount, $filters);?>
+   <?php self::showSorting($allCount, $filters);?>
 
     <section class="shop__list">
         <?php foreach($goods as $goodItem):?>
