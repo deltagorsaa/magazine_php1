@@ -4,12 +4,17 @@ namespace ext;
 function isCurrentUrl(string $url): bool
 {
     static $currentUrl;
-    $currentUrl = $currentUrl ?? strtolower(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+    $currentUrl = $currentUrl ?? remoteLastSplash(strtolower(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));
 
-    return $currentUrl === $url;
+    return $currentUrl === remoteLastSplash($url);
 }
 
-function showMenu(array $menu, string $navClassName,string $ulClassName,bool $isShowActive = true, string $itemClassName = 'main-menu__item')
+function remoteLastSplash($url)
+{
+    return substr($url, -1) === '/' ? substr_replace($url, '', -1) : $url;
+}
+
+function showMenu(array $menu, string $navClassName,string $ulClassName, bool $isShowActive = true, array $userRoles = [], string $itemClassName = 'main-menu__item')
 {
     require $_SERVER['DOCUMENT_ROOT'] . '/templates/menu.php';
 }
@@ -18,4 +23,9 @@ function redirectTo($url)
 {
     header('Location: '. $url,true, 302);
     exit();
+}
+
+function createNewGuid()
+{
+    return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
 }

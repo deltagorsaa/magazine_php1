@@ -3,7 +3,7 @@ namespace dataAccess\goods;
 
 function getGoods(array $filter)
 {
-    $dbConnect = \db\getDbConnect();
+    $dbConnect = \dataAccess\getDbConnect();
     $addGroupsCode =implode(',', array_map(function ($val) use ($dbConnect) {return "'" . mysqli_real_escape_string($dbConnect, $val) . "'";}, $filter['groups']));
     $codeCount = sizeof($filter['groups']);
     $skip = ($filter['page']- 1) * GOODS_PER_PAGE;
@@ -65,14 +65,14 @@ function getGoods(array $filter)
          goods.${sort} ${sortDirection} " : ' ') .
         "limit ${skip}, ${take}";
 
-    return \db\executeQuery($dbQuery, $dbConnect);
+    return \dataAccess\executeQuery($dbQuery, $dbConnect);
 }
 
 function getRangeFilters($groupCode)
 {
-    $dbConnect = \db\getDbConnect();
+    $dbConnect = \dataAccess\getDbConnect();
     $dbQuery = "call get_price_filter_by_category('". mysqli_escape_string($dbConnect, $groupCode) ."')";
-    return \db\executeQuery($dbQuery, $dbConnect);
+    return \dataAccess\executeQuery($dbQuery, $dbConnect);
 }
 
 function getFilters($groupCode): array
@@ -116,7 +116,7 @@ function getFilters($groupCode): array
         where gg.is_gui_visible = true and gg.gui_filter_type is not null
     ";
 
-    foreach(\db\executeQuery($dbQuery, \db\getDbConnect()) as $categoryItem){
+    foreach(\dataAccess\executeQuery($dbQuery, \dataAccess\getDbConnect()) as $categoryItem){
         array_push($categories, $categoryItemFunctions[$categoryItem['type']]($categoryItem));
     }
 

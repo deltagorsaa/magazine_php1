@@ -3,5 +3,10 @@
         <img src="/img/logo.svg" alt="Fashion">
     </a>
 
-    <?php \ext\showMenu($menu, 'page-header__menu', 'main-menu main-menu--header')?>
+    <?php \ext\showMenu(
+            $menu
+            ,'page-header__menu'
+            ,'main-menu main-menu--header'
+            ,true
+            ,(method_exists($this, 'getUserRoles') ? $this-> getUserRoles() : []))?>
 </header>

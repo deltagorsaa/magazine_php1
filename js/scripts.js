@@ -6,8 +6,8 @@
     document.getElementsByClassName(changedClassName)[0].replaceWith(newElm.querySelector(`.${changedClassName}`));
   };
 
-  const sendFormData = function (url, method, data, okAction, errorAction) {
-    return fetch(url, {
+  const sendFormData = async function (url, method, data, okAction, errorAction) {
+    await fetch(url, {
       method: method,
       body: data
     }).then((res) => {
@@ -141,14 +141,17 @@
       };
 
       const selectedOfficeId = evt.target.querySelector('option:checked').value;
-      await sendFormData(
+      sendFormData(
           `/delivery/office/?part=yes&id=${selectedOfficeId}`,
           'GET',
           null,
           okSendCallback,
           ()=>{});
     }
-    document.querySelector('.order__delivery-offices__sorting-item .custom-form__select').addEventListener('change', orderOfficeDeliveryChangedEventHandler);
+    const deliveryOffices = document.querySelector('.order__delivery-offices__sorting-item .custom-form__select');
+    if (deliveryOffices != null) {
+      deliveryOffices.addEventListener('change', orderOfficeDeliveryChangedEventHandler);
+    }
   }
 
   const filterOrSortingChangedEventHandler = async (evt, pageNumber) => {
@@ -214,7 +217,7 @@
     const errorSendCallback = function(res) {
     };
     evt.preventDefault();
-    await sendFormData(getFilterFullUrl(pageNumber), 'GET', null, okSendCallback, errorSendCallback);
+    sendFormData(getFilterFullUrl(pageNumber), 'GET', null, okSendCallback, errorSendCallback);
   };
 
   const toggleHidden = (...fields) => {
@@ -234,7 +237,6 @@
   };
 
   const labelHidden = (form) => {
-
     form.addEventListener('focusout', (evt) => {
 
       const field = evt.target;
@@ -380,9 +382,8 @@
     const addInput = addList.querySelector('#product-photo');
 
     checkList(addList, addButton);
-
-    addInput.addEventListener('change', evt => {
-
+    let isPhotoChanged = false;
+    const changePhotoEventHandler = (evt) => {
       const template = document.createElement('LI');
       const img = document.createElement('IMG');
 
@@ -404,18 +405,54 @@
       };
 
       reader.readAsDataURL(file);
+      isPhotoChanged = true;
+    };
 
-    });
+    addInput.addEventListener('change', changePhotoEventHandler);
 
     const button = document.querySelector('.button');
     const popupEnd = document.querySelector('.page-add__popup-end');
 
     button.addEventListener('click', (evt) => {
-
       evt.preventDefault();
 
-      form.hidden = true;
-      popupEnd.hidden = false;
+      const name = form.querySelector('#product-name').value ?? null;
+      const price = form.querySelector('#product-price').value ?? null;
+      const photo = form.querySelector('#product-photo').files[0] ?? null;
+      const group = form.querySelector('.custom-form__select > option:checked').attributes.getNamedItem('value').value ?? null;
+      const isNew = form.querySelector('#new:checked');
+      const isSale = form.querySelector('#sale:checked');
+
+      if (name != null && price != null && photo != null && group != null) {
+        const data = new FormData();
+        if (form.id != null) {
+          data.append('id', form.id)
+        }
+
+        data.append('name', name);
+        data.append('price', price);
+        const groups = [group];
+        isNew !== null ? groups.push('new') : null;
+        isSale !== null ? groups.push('sale') : null;
+
+        data.append('groups', JSON.stringify(groups));
+
+        if (isPhotoChanged) {
+          data.append('photo', photo, photo.name);
+        }
+        console.log(data);
+        sendFormData(
+            `/admin/products/${form.id != null ? 'change/' : 'add/'}`
+            ,'POST'
+            ,data
+            ,(res) => {
+              form.hidden = true;
+              popupEnd.hidden = false;
+            },
+            ()=> {}
+        )
+      }
+      
 
     })
 
@@ -429,11 +466,15 @@
       const target = evt.target;
 
       if (target.classList && target.classList.contains('product-item__delete')) {
-
-        productsList.removeChild(target.parentElement);
-
+        sendFormData(
+            ''
+            ,'DELETE'
+            ,target.parentElement.querySelector('.product-item__field.product-item__id').innerHTML
+            ,(res)=>{
+              productsList.removeChild(target.parentElement);
+            }
+            ,() => {});
       }
-
     });
   }
 
@@ -475,6 +516,20 @@
   if (orderCloseButton){
     orderCloseButton.addEventListener('click' , () => toggleHidden(document.querySelector('.intro'), document.querySelector('.shop'), shopOrder));
   }
+/*
+  const goodPhotoField = document.querySelector('#product-photo')
+  if ( goodPhotoField!= null) {
+    const src = goodPhotoField.attributes.getNamedItem('value').value;
+    if (src != null) {
+      console.log('xxx');
+      goodPhotoField.files[0] = src;
+
+      const evt = document.createEvent("HTMLEvents");
+      evt.initEvent("change", false, true);
+      goodPhotoField.dispatchEvent(evt);
+    }
+  }
+ */
 })();
 
 

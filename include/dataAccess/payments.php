@@ -3,7 +3,7 @@ namespace dataAccess\payments;
 
 function getPaymentTypes(): array
 {
-    $dbConnection = \db\getDbConnect();
+    $dbConnection = \dataAccess\getDbConnect();
     $dbQuery = 'select * from payment_types';
-    return \db\executeQuery($dbQuery, $dbConnection);
+    return \dataAccess\executeQuery($dbQuery, $dbConnection);
 }

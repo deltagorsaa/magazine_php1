@@ -1,9 +1,10 @@
 <?php
-namespace controllers;
-require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/admin.php';
-require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
+namespace controllers\admin;
 
-abstract class BaseAuth extends BaseController
+require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
+require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/admin/admin.php';
+
+abstract class BaseAuth extends \controllers\BaseController
 {
     protected $noAuthUrl = '\admin';
 
@@ -12,13 +13,24 @@ abstract class BaseAuth extends BaseController
         'withJquery' => false
     ];
 
+    protected function getUserRoles()
+    {
+        return $_SESSION['rolesId'] ?? [];
+    }
+
+    abstract protected function getAccessLevels(): array;
+
     protected function processBefore($params)
     {
         $this -> renewCurrentSession();
+        $accessLevels = $this->getAccessLevels();
 
         if (empty($_SESSION['userId']) && !empty($this -> noAuthUrl))
         {
             \ext\redirectTo($this -> noAuthUrl);
+        } elseif (!empty($_SESSION['rolesId']) && sizeof($accessLevels) > 0 && sizeof(array_intersect($_SESSION['rolesId'], $accessLevels)) === 0) {
+            http_response_code(403);
+            exit();
         }
     }
 
@@ -49,6 +61,13 @@ abstract class BaseAuth extends BaseController
         unset($_SESSION['userLogin']);
         $this -> renewSessionCookie(1);
         session_destroy();
+        \ext\redirectTo('/');
+    }
+
+    protected function setAuth($userData)
+    {
+        $_SESSION['userId'] = $userData['id'];
+        $_SESSION['rolesId'] = $userData['rolesId'];
     }
 }
 
@@ -62,6 +81,24 @@ final class Admin extends BaseAuth
         $this -> viewModel['title'] = 'Авторизация';
     }
 
+    protected function getAccessLevels(): array
+    {
+        return  [];
+    }
+
+    protected function processBefore($params)
+    {
+        parent::processBefore($params);
+
+        if (!empty($params['logoff'])) {
+            parent::logOff();
+        }
+
+        if (!empty($_SESSION['userId'])) {
+            \ext\redirectTo(ADMIN_ORDERS_URL);
+        }
+    }
+
     protected function showContent($params)
     {
         require $_SERVER['DOCUMENT_ROOT'] . '/templates/admin/authorization.php';
@@ -72,13 +109,25 @@ final class Admin extends BaseAuth
         $login = htmlspecialchars($_POST['login']) ?? null;
         $password = htmlspecialchars($_POST['password']) ?? null;
         if (isset($login) && isset($password)) {
-            $this -> setAuth(5);
-            \ext\redirectTo('\admin\orders');
+            $user = \dataAccess\admin\getAuthData($login, $password);
+            if (empty($user)) {
+                http_response_code(403);
+            } else {
+                parent::setAuth([
+                    'id' => $user[0]['id'],
+                    'rolesId' => array_map(function ($elm) {return $elm['group_id'];}, $user)
+                                 ]);
+                \ext\redirectTo(ADMIN_ORDERS_URL);
+            }
         }
     }
+}
 
-    private function setAuth(int $userId)
+abstract class AdminPages extends BaseAuth
+{
+    protected function showHeader($params)
     {
-        $_SESSION['userId'] = $userId;
+        $menu = \dataAccess\admin\getAdminMenu();
+        require $_SERVER['DOCUMENT_ROOT'] . '/templates/header.php';
     }
 }

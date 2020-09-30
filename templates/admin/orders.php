@@ -1,47 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <title>Список заказов</title>
-
-  <meta name="description" content="Fashion - интернет-магазин">
-  <meta name="keywords" content="Fashion, интернет-магазин, одежда, аксессуары">
-
-  <meta name="theme-color" content="#393939">
-
-  <link rel="preload" href="fonts/opensans-400-normal.woff2" as="font">
-  <link rel="preload" href="fonts/roboto-400-normal.woff2" as="font">
-  <link rel="preload" href="fonts/roboto-700-normal.woff2" as="font">
-
-  <link rel="icon" href="img/favicon.png">
-  <link rel="stylesheet" href="css/style.min.css">
-  <script src="js/scripts.js" defer=""></script>
-</head>
-<body>
-<header class="page-header">
-  <a class="page-header__logo" href="#">
-    <img src="img/logo.svg" alt="Fashion">
-  </a>
-  <nav class="page-header__menu">
-    <ul class="main-menu main-menu--header">
-      <li>
-        <a class="main-menu__item" href="index.php">Главная</a>
-      </li>
-      <li>
-        <a class="main-menu__item" href="products.html">Товары</a>
-      </li>
-      <li>
-        <a class="main-menu__item active" href="orders.php">Заказы</a>
-      </li>
-      <li>
-        <a class="main-menu__item" href="#">Выйти</a>
-      </li>
-    </ul>
-  </nav>
-</header>
 <main class="page-order">
   <h1 class="h h--1">Список заказов</h1>
   <ul class="page-order__list">
+
+
     <li class="order-item page-order__item">
       <div class="order-item__wrapper">
         <div class="order-item__group order-item__group--id">
@@ -90,6 +51,8 @@
         </div>
       </div>
     </li>
+
+
     <li class="order-item page-order__item">
       <div class="order-item__wrapper">
         <div class="order-item__group order-item__group--id">
@@ -140,31 +103,3 @@
     </li>
   </ul>
 </main>
-<footer class="page-footer">
-  <div class="container">
-    <a class="page-footer__logo" href="#">
-      <img src="img/logo--footer.svg" alt="Fashion">
-    </a>
-    <nav class="page-footer__menu">
-      <ul class="main-menu main-menu--footer">
-        <li>
-          <a class="main-menu__item" href="#">Главная</a>
-        </li>
-        <li>
-          <a class="main-menu__item" href="#">Новинки</a>
-        </li>
-        <li>
-          <a class="main-menu__item" href="index.php">Sale</a>
-        </li>
-        <li>
-          <a class="main-menu__item" href="delivery.php">Доставка</a>
-        </li>
-      </ul>
-    </nav>
-    <address class="page-footer__copyright">
-      © Все права защищены
-    </address>
-  </div>
-</footer>
-</body>
-</html>

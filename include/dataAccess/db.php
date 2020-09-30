@@ -1,5 +1,5 @@
 <?php
-namespace db;
+namespace dataAccess;
 
 function getDbConnect()
 {
@@ -8,9 +8,16 @@ function getDbConnect()
     return $dbConnect;
 }
 
-function executeQuery($dbQuery, $dbConnect):array
+function executeQuery($dbQuery, $dbConnect, $autoClose = true): array
 {
     $dbQueryResult = mysqli_query($dbConnect, $dbQuery);
-    mysqli_close($dbConnect);
+    if ($dbQueryResult === false) {
+        throw new \Exception();
+    }
+    if ($autoClose) {
+        mysqli_close($dbConnect);
+    } else {
+        return [];
+    }
     return $dbQueryResult ? mysqli_fetch_all($dbQueryResult, MYSQLI_ASSOC) : [];
 }

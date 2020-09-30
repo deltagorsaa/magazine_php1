@@ -3,13 +3,13 @@ namespace dataAccess\delivery;
 
 function getDeliveryTypes(): array
 {
-    $dbConnection = \db\getDbConnect();
+    $dbConnection = \dataAccess\getDbConnect();
     $dbQuery = 'select * from delivery_types';
-    return \db\executeQuery($dbQuery, $dbConnection);
+    return \dataAccess\executeQuery($dbQuery, $dbConnection);
 }
 
 function getDeliveryOffices():array{
-    $dbConnection = \db\getDbConnect();
+    $dbConnection = \dataAccess\getDbConnect();
     $dbQuery = "
         select
             dof.id,
@@ -22,12 +22,12 @@ function getDeliveryOffices():array{
         join streets on streets.id = dof.street_id
         join cities on cities.id = streets.city_id
         join countries on countries.id = cities.country_id";
-    return \db\executeQuery($dbQuery, $dbConnection);
+    return \dataAccess\executeQuery($dbQuery, $dbConnection);
 }
 
 function getDeliveryOffice($officeId): array
 {
-    $dbConnection = \db\getDbConnect();
+    $dbConnection = \dataAccess\getDbConnect();
     $dbQuery = "
         select
             dof.id,
@@ -51,7 +51,7 @@ function getDeliveryOffice($officeId): array
         join countries on countries.id = cities.country_id
         where dof.id = ${officeId}
         order by dofw.day_number";
-    return \db\executeQuery($dbQuery, $dbConnection);
+    return \dataAccess\executeQuery($dbQuery, $dbConnection);
 }
 
 function getPreDaysData($deliveryOfficeDefault): array

@@ -8,3 +8,12 @@ define('MONTH', [['январ', 'я'], ['феврал' ,'я'], ['март', 'а'
 define('PHP_SESSION_NAME', 'diplom_sn');
 define('PHP_SESSION_EXPIRE_MIN', 600);
 define('PHP_SESSION_COOKIE_LIFETIME_MIN', 30);
+define('IMAGE_TYPE_RESTRICS',  ['image/jpeg', 'image/png']);
+define('IMAGE_MAX_BYTE_SIZE',  5 * pow(1024, 2));
+define('IMAGE_LIST_PATH', '/img/products/');
+
+define('ADMIN_ORDERS_URL', '/admin/orders/');
+define('ADMIN_LOGOFF_URL', '/admin?logoff=true');
+
+define('ROLE_OPERATOR', 1);
+define('ROLE_ADMIN', 2);
