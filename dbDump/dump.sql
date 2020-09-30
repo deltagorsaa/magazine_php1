@@ -266,6 +266,7 @@ DROP TABLE IF EXISTS `good_group`;
 CREATE TABLE `good_group` (
   `good_id` int NOT NULL,
   `group_id` int DEFAULT NULL,
+  `is_main` tinyint(1) NOT NULL DEFAULT '0',
   UNIQUE KEY `good_group_idx` (`good_id`,`group_id`),
   KEY `good_group_group_fk_idx` (`group_id`),
   CONSTRAINT `good_group_good_fk` FOREIGN KEY (`good_id`) REFERENCES `goods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -279,7 +280,7 @@ CREATE TABLE `good_group` (
 
 LOCK TABLES `good_group` WRITE;
 /*!40000 ALTER TABLE `good_group` DISABLE KEYS */;
-INSERT INTO `good_group` VALUES (1,1),(1,2),(2,1),(2,3),(3,1),(4,1),(5,1),(5,6),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1),(14,1);
+INSERT INTO `good_group` VALUES (16,2,1),(16,6,0),(19,2,1),(19,6,0),(19,7,0),(19,1,0);
 /*!40000 ALTER TABLE `good_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -321,14 +322,14 @@ CREATE TABLE `goods` (
   `id` int NOT NULL AUTO_INCREMENT,
   `short_name` varchar(45) NOT NULL,
   `price` double NOT NULL,
-  `currency_code` smallint NOT NULL,
+  `currency_code` smallint NOT NULL DEFAULT '1',
   `image_path` varchar(255) NOT NULL,
   `create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_active` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `goods_currency_fk_idx` (`currency_code`),
   CONSTRAINT `goods_currency_fk` FOREIGN KEY (`currency_code`) REFERENCES `currencies` (`code`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -337,9 +338,59 @@ CREATE TABLE `goods` (
 
 LOCK TABLES `goods` WRITE;
 /*!40000 ALTER TABLE `goods` DISABLE KEYS */;
-INSERT INTO `goods` VALUES (1,'Платье со складками',800,1,'/img/products/product-1.jpg','2020-07-28 19:14:53',1),(2,'Платье со складками',900,1,'/img/products/product-2.jpg','2020-07-28 19:15:02',1),(3,'Платье со складками',1000,1,'/img/products/product-3.jpg','2020-07-28 19:15:04',1),(4,'Платье со складками',5000,1,'/img/products/product-4.jpg','2020-07-28 19:15:07',1),(5,'Платье со складками',2999,1,'/img/products/product-5.jpg','2020-07-28 19:15:10',1),(6,'Платье со складками',2999,1,'/img/products/product-6.jpg','2020-07-28 19:15:13',1),(7,'Платье со складками',2999,1,'/img/products/product-7.jpg','2020-07-28 19:15:16',1),(8,'Платье со складками',2999,1,'/img/products/product-8.jpg','2020-07-28 19:15:19',1),(9,'Платье со складками',2999,1,'/img/products/product-9.jpg','2020-07-28 19:15:22',1),(10,'Платье со складками',2999,1,'/img/products/product-1.jpg','2020-07-28 19:15:31',1),(11,'Платье со складками',2999,1,'/img/products/product-2.jpg','2020-07-28 19:15:33',1),(12,'Платье со складками',2999,1,'/img/products/product-3.jpg','2020-07-28 19:15:36',0),(13,'Платье со складками',2999,1,'/img/products/product-4.jpg','2020-07-28 19:15:38',0),(14,'Платье со складками',2999,1,'/img/products/product-5.jpg','2020-07-28 19:15:41',0);
+INSERT INTO `goods` VALUES (16,'qwerty',8005,1,'/img/products/CC7D17C4-1EE8-4113-A732-EB2BCD9399CB_1598588829808_default.jpg','2020-09-29 13:02:42',1),(17,'qwerty',8005,1,'/img/products/D69FC0C9-7124-474E-93EE-9A333C02C461_1598588829808_default.jpg','2020-09-29 13:05:28',0),(19,'Привет1',800,1,'/img/products/D91E2BCA-229D-46C2-8FBC-3E160F2CD668_product-1.jpg','2020-09-29 14:41:37',1);
 /*!40000 ALTER TABLE `goods` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`127.0.0.1`*/ /*!50003 TRIGGER `goods_AFTER_INSERT` AFTER INSERT ON `goods` FOR EACH ROW BEGIN
+Insert INTO goods_history (good_id, short_name, price, currency_code, image_path,  change_at, is_active) values (
+	new.id,
+    new.short_name,
+    new.price,
+    new.currency_code,
+    new.image_path
+	,CURRENT_TIMESTAMP,
+    new.is_active
+);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`127.0.0.1`*/ /*!50003 TRIGGER `goods_AFTER_UPDATE` AFTER UPDATE ON `goods` FOR EACH ROW BEGIN
+Insert INTO goods_history (good_id, short_name, price, currency_code, image_path, change_at, is_active) values (
+	old.id,
+    old.short_name,
+    old.price,
+    old.currency_code,
+    old.image_path
+	,CURRENT_TIMESTAMP
+    ,old.is_active
+);
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `goods_history`
@@ -349,17 +400,20 @@ DROP TABLE IF EXISTS `goods_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `goods_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
   `good_id` int NOT NULL,
   `short_name` varchar(45) NOT NULL,
   `price` double NOT NULL,
   `currency_code` smallint NOT NULL,
   `image_path` varchar(255) NOT NULL,
   `change_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
   KEY `goods_history_currency_fk_idx` (`currency_code`),
   KEY `goods_history_good_fk_idx` (`good_id`),
   CONSTRAINT `goods_history_currency_fk` FOREIGN KEY (`currency_code`) REFERENCES `currencies` (`code`) ON UPDATE CASCADE,
-  CONSTRAINT `goods_history_good_fk` FOREIGN KEY (`good_id`) REFERENCES `goods` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  CONSTRAINT `goods_history_good_fk` FOREIGN KEY (`good_id`) REFERENCES `goods` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -368,6 +422,7 @@ CREATE TABLE `goods_history` (
 
 LOCK TABLES `goods_history` WRITE;
 /*!40000 ALTER TABLE `goods_history` DISABLE KEYS */;
+INSERT INTO `goods_history` VALUES (3,16,'qwerty',8005,1,'/img/products/D69FC0C9-7124-474E-93EE-9A333C02C461_1598588829808_default.jpg','2020-09-29 13:02:42',1),(4,17,'qwerty',8005,1,'/img/products/D69FC0C9-7124-474E-93EE-9A333C02C461_1598588829808_default.jpg','2020-09-29 13:05:28',1),(6,16,'qwerty',8005,1,'/img/products/D69FC0C9-7124-474E-93EE-9A333C02C461_1598588829808_default.jpg','2020-09-29 14:01:41',1),(19,16,'qwerty',8005,1,'/img/products/096C9CD5-DFC7-4B94-9F1F-4C969835104F_1598588829808_default.jpg','2020-09-29 14:39:15',1),(20,19,'Привет1',800,1,'/img/products/B6584A5C-16BB-4072-9A22-A80C37489070_product-1.jpg','2020-09-29 14:41:37',1),(21,19,'Привет1',800,1,'/img/products/B6584A5C-16BB-4072-9A22-A80C37489070_product-1.jpg','2020-09-29 14:45:29',1),(22,17,'qwerty',8005,1,'/img/products/D69FC0C9-7124-474E-93EE-9A333C02C461_1598588829808_default.jpg','2020-09-29 14:49:25',1);
 /*!40000 ALTER TABLE `goods_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -531,6 +586,7 @@ CREATE TABLE `user_group` (
 
 LOCK TABLES `user_group` WRITE;
 /*!40000 ALTER TABLE `user_group` DISABLE KEYS */;
+INSERT INTO `user_group` VALUES (1,1),(2,1),(1,2);
 /*!40000 ALTER TABLE `user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -570,12 +626,12 @@ CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `full_name` varchar(100) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `password` binary(255) NOT NULL,
-  `phone` int NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` bigint NOT NULL,
   `create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `is_active` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -584,6 +640,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Александр','delta@gorshkov-aleksandr.ru','790feaddf3848cb0d054c203e6895ae97352928bf4427c8da47d582796401dae',70000000000,'2020-09-24 00:00:00',1),(2,'Александр 1','a@a.com','790feaddf3848cb0d054c203e6895ae97352928bf4427c8da47d582796401dae',70000000001,'2020-09-25 00:00:00',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -629,4 +686,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-29 18:17:05
+-- Dump completed on 2020-09-30 10:20:40
