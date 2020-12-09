@@ -1,20 +1,20 @@
 <?php
 namespace dataAccess\goods;
 
-function getGoods(array $filter)
+function getGoodsSelectSqlQuery($dbConnect, $filter): string
 {
-    $dbConnect = \dataAccess\getDbConnect();
     $addGroupsCode =implode(',', array_map(function ($val) use ($dbConnect) {return "'" . mysqli_real_escape_string($dbConnect, $val) . "'";}, $filter['groups']));
     $codeCount = sizeof($filter['groups']);
-    $skip = ($filter['page']- 1) * GOODS_PER_PAGE;
+    $skip = !empty($filter['page']) ? ($filter['page']- 1) * GOODS_PER_PAGE : null;
     $take = GOODS_PER_PAGE;
-    $sort = mysqli_real_escape_string($dbConnect, $filter['sorting']['sort']);
-    $sortDirection = mysqli_real_escape_string($dbConnect, $filter['sorting']['direction']);
-/* Для MySql 8
+    $sort = !empty($filter['sorting']) ? mysqli_real_escape_string($dbConnect, $filter['sorting']['sort']) : null;
+    $sortDirection = !empty($filter['sorting']) ? mysqli_real_escape_string($dbConnect, $filter['sorting']['direction']) : null;
+
+    /* Для MySql 8  Уже нужно доделывать
     $dbQuery = "
-        with filtredGoods as 
+        with filtredGoods as
         (
-            select gg.good_id from good_groups ggr 
+            select gg.good_id from good_groups ggr
             join good_group gg on gg.group_id = ggr.id
             join goods on goods.id = gg.good_id and goods.is_active = ${filter['isActive']} and goods.price between ${filter['minPrice']} and ${filter['maxPrice']}
             where " .
@@ -24,8 +24,8 @@ function getGoods(array $filter)
 	            gg.good_id
             having
 	            count(gg.good_id) = ${codeCount} ") .
-        ") 
-        select 
+        ")
+        select
             (select count(*) from filtredGoods) as count,
             goods.id,
             goods.short_name,
@@ -34,7 +34,7 @@ function getGoods(array $filter)
         from filtredGoods
         join goods on goods.id=filtredGoods.good_id " .
         (!empty($sort) && !empty($sortDirection) ?
-            "order by 
+            "order by
          goods.${sort} ${sortDirection} " : ' ') .
         "limit ${skip}, ${take}";
 */
@@ -42,8 +42,11 @@ function getGoods(array $filter)
     $withQuery = "
             select gg.good_id from good_groups ggr 
             join good_group gg on gg.group_id = ggr.id
-            join goods on goods.id = gg.good_id and goods.is_active = ${filter['isActive']} and goods.price between ${filter['minPrice']} and ${filter['maxPrice']}
-            where " .
+            join goods on 
+                goods.id = gg.good_id 
+                and goods.is_active = ${filter['isActive']} "
+                . ((!empty($filter['minPrice']) && !empty($filter['maxPrice'])) ? " and goods.price between ${filter['minPrice']} and ${filter['maxPrice']}" : '')
+                . " where " .
         ($codeCount === 1 ? "ggr.code = ${addGroupsCode}" :
             " ggr.code in (${addGroupsCode})
             group by
@@ -51,7 +54,7 @@ function getGoods(array $filter)
             having
 	            count(gg.good_id) = ${codeCount} ");
 
-    $dbQuery = "
+    return "
         select 
             (select count(*) from (${withQuery}) tmp) as count,
             goods.id,
@@ -61,21 +64,38 @@ function getGoods(array $filter)
         from (${withQuery}) as filtredGoods
         join goods on goods.id=filtredGoods.good_id " .
         (!empty($sort) && !empty($sortDirection) ?
-            "order by 
+            " order by 
          goods.${sort} ${sortDirection} " : ' ') .
-        "limit ${skip}, ${take}";
-
-    return \dataAccess\executeQuery($dbQuery, $dbConnect);
+        (isset($skip) && isset($take) ? " limit ${skip}, ${take} " : '');
 }
 
-function getRangeFilters($groupCode)
+function getGoods(array $filter)
 {
     $dbConnect = \dataAccess\getDbConnect();
-    $dbQuery = "call get_price_filter_by_category('". mysqli_escape_string($dbConnect, $groupCode) ."')";
+    $dbQuery = getGoodsSelectSqlQuery($dbConnect, $filter);
     return \dataAccess\executeQuery($dbQuery, $dbConnect);
 }
 
-function getFilters($groupCode): array
+function getRangeFilters(array $groupsCode)
+{
+    $dbConnect = \dataAccess\getDbConnect();
+    $baseQuery = getGoodsSelectSqlQuery($dbConnect, ['groups' => $groupsCode, 'isActive' => true]);
+    $dbQuery =
+        "Select
+            'Цена' as name,
+            'руб' as dimension,
+            'min-price' as min_id,
+            'max-price' as max_id,
+            MIN(goods.price) as min_value,
+            MAX(goods.price) as max_value
+        from (
+            ${baseQuery}
+        ) as goods"
+        ;
+    return \dataAccess\executeQuery($dbQuery, $dbConnect);
+}
+
+function getFilters(array $groupsCode): array
 {
     $categories = [];
     $categoryItemFunctions = [
@@ -120,7 +140,7 @@ function getFilters($groupCode): array
         array_push($categories, $categoryItemFunctions[$categoryItem['type']]($categoryItem));
     }
 
-    array_push($categories, $categoryItemFunctions['range'](getRangeFilters($groupCode)[0]));
+    array_push($categories, $categoryItemFunctions['range'](getRangeFilters($groupsCode)[0]));
     return $categories;
 }
 

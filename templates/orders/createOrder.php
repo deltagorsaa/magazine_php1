@@ -22,11 +22,11 @@
                         <p class="custom-form__input-label">Отчество</p>
                     </label>
                     <label class="custom-form__input-wrapper" for="phone">
-                        <input id="phone" class="custom-form__input" type="tel" name="thirdName" required="">
+                        <input id="phone" class="custom-form__input" type="tel" name="phone" required="">
                         <p class="custom-form__input-label">Телефон <span class="req">*</span></p>
                     </label>
                     <label class="custom-form__input-wrapper" for="email">
-                        <input id="email" class="custom-form__input" type="email" name="thirdName" required="">
+                        <input id="email" class="custom-form__input" type="email" name="email" required="">
                         <p class="custom-form__input-label">Почта <span class="req">*</span></p>
                     </label>
                 </div>
@@ -53,14 +53,33 @@
                         <span class="req">*</span> поля обязательные для заполнения
                     </p>
                     <div class="custom-form__row">
-                        <label class="custom-form__input-wrapper" for="city">
-                            <input id="city" class="custom-form__input" type="text" name="city">
-                            <p class="custom-form__input-label">Город <span class="req">*</span></p>
-                        </label>
+                        <!--
+                            <label class="custom-form__input-wrapper" for="city">
+                                <input id="city" class="custom-form__input" type="text" name="city">
+                                <p class="custom-form__input-label">Город <span class="req">*</span></p>
+                            </label>
+                            -->
+
+                        <div class="custom-form__select-wrapper custom-form__input-wrapper width-100">
+                            <select id="city" class="custom-form__select" name="city">
+                                <?php foreach ($cities as $city):?>
+                                    <option value="<?=$city['id']?>" <?=$city['id'] === 1 ? 'selected' : ''?>>
+                                        г. <?=$city['name']?>
+                                    </option>
+                                <?php endforeach?>
+                            </select>
+                        </div>
+
+                        <!--
                         <label class="custom-form__input-wrapper" for="street">
                             <input id="street" class="custom-form__input" type="text" name="street">
                             <p class="custom-form__input-label">Улица <span class="req">*</span></p>
                         </label>
+                        -->
+                        <div class="custom-form__select-wrapper custom-form__input-wrapper width-100">
+                            <?php require $_SERVER['DOCUMENT_ROOT'] . '/templates/orders/streets.php' ?>
+                        </div>
+
                         <label class="custom-form__input-wrapper" for="home">
                             <input id="home" class="custom-form__input custom-form__input--small" type="text" name="home">
                             <p class="custom-form__input-label">Дом <span class="req">*</span></p>

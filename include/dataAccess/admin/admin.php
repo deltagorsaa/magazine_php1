@@ -36,7 +36,7 @@ function getAuthData(string $login, string $password)
 
     $dbQuery = "
         select * from user_group ug
-        join users on ug.user_id = users.id and users.email = '${login}' and users.password='${password}' and users.is_active = 1";
+        join users on ug.user_id = users.id and users.email = '${login}' and users.password='${password}' and users.is_active = 1 and users.is_client = 0";
 
     return \dataAccess\executeQuery($dbQuery, $dbConnect);
 }

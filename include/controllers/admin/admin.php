@@ -1,7 +1,6 @@
 <?php
 namespace controllers\admin;
 
-require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/admin/admin.php';
 
 abstract class BaseAuth extends \controllers\BaseController
@@ -111,7 +110,8 @@ final class Admin extends BaseAuth
         if (isset($login) && isset($password)) {
             $user = \dataAccess\admin\getAuthData($login, $password);
             if (empty($user)) {
-                http_response_code(403);
+                $params['authError'] = true;
+                parent::processGet($params);
             } else {
                 parent::setAuth([
                     'id' => $user[0]['id'],

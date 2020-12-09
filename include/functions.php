@@ -6,7 +6,7 @@ function isCurrentUrl(string $url): bool
     static $currentUrl;
     $currentUrl = $currentUrl ?? remoteLastSplash(strtolower(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)));
 
-    return $currentUrl === remoteLastSplash($url);
+    return ($currentUrl === remoteLastSplash($url)) || ($url === $_SERVER['REQUEST_URI']);
 }
 
 function remoteLastSplash($url)

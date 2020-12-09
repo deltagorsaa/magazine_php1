@@ -19,10 +19,15 @@
     <fieldset class="page-add__group custom-form__group">
       <legend class="page-add__small-title custom-form__title">Фотография товара</legend>
       <ul class="add-list">
-        <li class="add-list__item add-list__item--add">
-          <input type="file" name="product-photo" id="product-photo" hidden="" value="<?= $changedProduct['image_path'] ?? null ?>" required>
-          <label for="product-photo">Добавить фотографию</label>
-        </li>
+          <li class="add-list__item add-list__item--add">
+            <input type="file" name="product-photo" id="product-photo" hidden="" value="<?= $changedProduct['image_path'] ?? null ?>" accept="image/jpeg,image/png" required>
+            <label for="product-photo">Добавить фотографию</label>
+          </li>
+          <?php if(!empty($changedProduct['image_path'])):?>
+          <li class="add-list__item add-list__item--active">
+            <img src="<?= $changedProduct['image_path'] ?>">
+          </li>
+          <?php endif; ?>
       </ul>
     </fieldset>
     <fieldset class="page-add__group custom-form__group">

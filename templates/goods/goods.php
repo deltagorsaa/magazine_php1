@@ -1,15 +1,18 @@
+<?php
+    $filters = self::createGoodsFilterFromUrl();
+?>
 <div class="shop__wrapper">
    <?php self::showSorting($allCount, $filters);?>
 
     <section class="shop__list">
         <?php foreach($goods as $goodItem):?>
-            <article class="shop__item product" tabindex="0">
+            <article class="shop__item product" tabindex="0" id="<?='good_' . $goodItem['id']?>">
                 <div class="product__image">
                     <img src="<?=$goodItem['image_path']?>" alt="product-name">
                 </div>
                 <p class="product__name"><?=$goodItem['short_name']?></p>
                 <span class="product__price">
-                <?=number_format($goodItem['price'], $goodItem['price'] - round($goodItem['price'], 2, PHP_ROUND_HALF_DOWN) == 0 ? 0 : 2,'.',' ')?> руб.
+                    <?=number_format($goodItem['price'], $goodItem['price'] == 0 ? 0 : 2,'.',' ')?> руб.
             </span>
             </article>
         <?php endforeach?>

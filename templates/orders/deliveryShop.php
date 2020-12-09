@@ -9,10 +9,10 @@ if (empty($_GET['part'])):?>
         <tr>
             <td class="custom-table__head">Адрес:</td>
             <td class="order__sorting">
-                <div class="order__delivery-offices__sorting-item custom-form__select-wrapper">
+                <div class="order__delivery-offices__sorting-item custom-form__select-wrapper width-100">
                     <select class="custom-form__select" name="delivery_offices">
                         <?php foreach ($deliveryOffices as $deliveryOffice):?>
-                            <option value="delivery_office_<?=$deliveryOffice['id']?>" <?=$deliveryOffice['id'] === $deliveryOfficeDefaultId ? 'selected' : ''?>>
+                            <option value="<?=$deliveryOffice['id']?>" <?=$deliveryOffice['id'] === $deliveryOfficeDefaultId ? 'selected' : ''?>>
                                 <?=$deliveryOffice['country']?> г, <?=$deliveryOffice['city']?> ул, <?=$deliveryOffice['street'] . ' ' . $deliveryOffice['street_number'] . ($deliveryOffice['room'] ? ' - ' . $deliveryOffice['room'] : '')?>
                             </option>
                         <?php endforeach?>

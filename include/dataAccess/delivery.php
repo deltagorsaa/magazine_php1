@@ -25,6 +25,16 @@ function getDeliveryOffices():array{
     return \dataAccess\executeQuery($dbQuery, $dbConnection);
 }
 
+function getCities():array
+{
+    return \dataAccess\executeQuery('select id, name from cities', \dataAccess\getDbConnect());
+}
+
+function getStreets(int $cityId):array
+{
+    return \dataAccess\executeQuery("select id, name from streets where city_id = ${cityId}", \dataAccess\getDbConnect());
+}
+
 function getDeliveryOffice($officeId): array
 {
     $dbConnection = \dataAccess\getDbConnect();

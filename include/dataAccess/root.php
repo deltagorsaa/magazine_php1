@@ -10,11 +10,11 @@ function getMenu(): array
         ],
         [
             'name' => 'Новинки',
-            'link' => '/goods/new/'
+            'link' => '/?checked=new'
         ],
         [
             'name' => 'Sale',
-            'link' => '/goods/sale/'
+            'link' => '/?checked=sale'
         ],
         [
             'name' => 'Доставка',

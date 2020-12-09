@@ -2,8 +2,6 @@
 
 namespace controllers;
 
-require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/root.php';
-
 abstract class Controller
 {
     protected $viewModel = [
@@ -26,10 +24,12 @@ abstract class Controller
         }
     }
 
-    private function processGet($params)
+    final protected function processGet($params)
     {
         if (empty($_GET['part'])) {
             require $_SERVER['DOCUMENT_ROOT'] . '/templates/rootHeader.php';
+            $this -> showHeader($params);
+        } else {
             $this -> showHeader($params);
         }
 
@@ -38,6 +38,8 @@ abstract class Controller
         if (empty($_GET['part'])) {
             $this -> showFooter($params);
             require $_SERVER['DOCUMENT_ROOT'] . '/templates/rootFooter.php';
+        } else {
+            $this -> showFooter($params);
         }
     }
 

@@ -1,6 +1,6 @@
 <footer class="page-footer">
     <div class="container">
-        <a class="page-footer__logo" href="#">
+        <a class="page-footer__logo" href="/">
             <img src="/img/logo--footer.svg" alt="Fashion">
         </a>
         <?php \ext\showMenu($menu, 'page-footer__menu', 'main-menu main-menu--footer', false)?>

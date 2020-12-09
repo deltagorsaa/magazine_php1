@@ -36,7 +36,7 @@ final class ProductsAdd extends AdminPages
           'shortName' =>  htmlspecialchars($_POST['name']),
           'price' => isset($_POST['price']) ? floatval($_POST['price']) : null,
           'groups' => json_decode($_POST['groups']),
-          'image' => $_FILES['photo'] ?? null
+          'image' => $_POST['photo'] ?? $_FILES['photo']
         ];
 
         \dataAccess\admin\saveProduct($product);

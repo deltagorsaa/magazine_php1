@@ -1,35 +1,24 @@
 <?php
 namespace controllers;
 
-require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/goods.php';
 
 final class Goods extends BaseController
 {
     protected function showContent($params)
     {
-        $this -> setGoodsGroup(htmlspecialchars($params[0] ?? 'all'));
+        $filters = self::createGoodsFilterFromUrl($params);
 
-        if (!empty($_GET['part'])){
-            self::showGoods();
+        if (isset($_GET['part']) && $_GET['part'] === 'true'){
+            require $_SERVER['DOCUMENT_ROOT'] . '/templates/mainShopContainer.php';
         } else {
             require $_SERVER['DOCUMENT_ROOT'] . '/templates/main.php';
         }
     }
 
-    private static function setGoodsGroup($groupId)
+    public static function createGoodsFilterFromUrl($params = null): array
     {
-        $_GET['cat'] = $groupId;
-    }
-
-    private static function getGoodsGroupId()
-    {
-        return $_GET['cat'];
-    }
-
-    public static function createGoodsFilterFromUrl(): array
-    {
-        $groups[] = isset($_GET['cat']) ? htmlspecialchars($_GET['cat']) : 'all';
+        $groups[] = htmlspecialchars($params[0] ?? 'all');;
         if (isset($_GET['checked'])) {
             $groups = array_merge($groups, explode('%', htmlspecialchars($_GET['checked'])));
         }
@@ -47,19 +36,14 @@ final class Goods extends BaseController
         ];
     }
 
-    public static function showGoods()
+    public static function showGoods(array $goods)
     {
-        $filters = self::createGoodsFilterFromUrl();
-        $goods =\dataAccess\goods\getGoods($filters);
         $allCount = isset($goods[0]) ? $goods[0]['count'] : 0;
-
         require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goods.php';
     }
 
-    public static function showFilters()
+    public static function showFilters(array $filters, $getCustomValues = null)
     {
-        $filters = \dataAccess\goods\getFilters(self::getGoodsGroupId());
-
         $getFilterCallback = function($filterType) {
             return function($value) use ($filterType) {
                 return $value['type'] === $filterType;
@@ -69,6 +53,7 @@ final class Goods extends BaseController
         $categoryFilters = array_filter($filters, $getFilterCallback('category'));
         $rangeFilters = array_filter($filters, $getFilterCallback('range'));
         $checkedFilters = array_filter($filters, $getFilterCallback('checked'));
+        $groupsInput = self::createGoodsFilterFromUrl()['groups'];
 
         require $_SERVER['DOCUMENT_ROOT'] . '/templates/goods/goodFilters.php';
     }

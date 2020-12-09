@@ -20,11 +20,11 @@
                     <div class="range__line" aria-label="Range Line"></div>
                     <div class="range__res">
                         <span class="range__res-item <?=$filterItem['minValueClass']?> min-value">
-                            <?=$filterItem['minValue']?> <?=$filterItem['dimension']?>
+                            <?= $getCustomValues ? $getCustomValues('range', $filterItem['minValueClass'], $filterItem['minValue']) : $filterItem['minValue']?>
                         </span>
 
                         <span class="range__res-item <?=$filterItem['maxValueClass']?> max-value">
-                            <?=$filterItem['maxValue']?> <?=$filterItem['dimension']?>
+                            <?= $getCustomValues ? $getCustomValues('range', $filterItem['maxValueClass'], $filterItem['maxValue']) : $filterItem['maxValue']?> <?=$filterItem['dimension']?>
                         </span>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                         name="<?=$filterItem['id']?>"
                         id="<?=$filterItem['id']?>"
                         class="custom-form__checkbox"
-                        <?=\ext\isCurrentUrl('/goods/'.$filterItem['id'] . '/') ? 'checked' : ''?>
+                        <?= in_array(strtolower($filterItem['id']), array_map(function ($elm) {return strtolower($elm); }, $groupsInput)) ? 'checked' : ''?>
                 >
                 <label for="<?=$filterItem['id']?>" class="custom-form__checkbox-label custom-form__info" style="display: block;"><?=$filterItem['name']?></label>
             <?php endforeach?>

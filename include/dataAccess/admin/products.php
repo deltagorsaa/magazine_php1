@@ -18,7 +18,8 @@ function getProducts(int $id = null)
         left join good_group gg on gg.good_id = goods.id and gg.is_main=1  
         left join good_groups ggs on ggs.id = gg.group_id
         where is_active=1" .
-        ($id !== null ? " and goods.id = ${id}" : '');
+        ($id !== null ? " and goods.id = ${id}" : '')
+        . ' order by goods.id desc';
     return \dataAccess\executeQuery($dbQuery, \dataAccess\getDbConnect());
 }
 
@@ -59,14 +60,14 @@ function saveProductImage(array $imageData)
 
 function saveProduct(array $productData)
 {
-    if (isset($productData['image'])) {
-        $filePath = saveProductImage($productData['image']);
-    }
-
     $dbConnect = \dataAccess\getDbConnect();
     $dbConnect->autocommit(false);
 
     try {
+        if (isset($productData['image']) && is_array($productData['image'])) {
+            $filePath = saveProductImage($productData['image']);
+        }
+
         $name = mysqli_real_escape_string($dbConnect, $productData['shortName']);
 
         $dbQuery = empty($productData['id']) ?
@@ -96,6 +97,11 @@ function saveProduct(array $productData)
                 . " from good_groups gg where gg.code = '${tmpCode}'", $dbConnect, false);
         }
 
+        $filePathH = $filePath ?? "( select image_path from goods where id = ${id} )";
+        $dbQuery = "Insert INTO goods_history (good_id, short_name, price, image_path, is_active) values ($id, '${name}', ${productData['price']}, "
+            . (isset($filePath) ? "'${filePath}'" : $filePathH) . ", 1);";
+        \dataAccess\executeQuery($dbQuery, $dbConnect, false);
+
         $dbConnect->commit();
     }
     catch (Exception $ex) {
@@ -104,6 +110,7 @@ function saveProduct(array $productData)
         }
 
         $dbConnect->rollback();
+        http_response_code(500);
         throw $ex;
     }
 

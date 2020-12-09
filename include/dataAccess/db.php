@@ -12,12 +12,12 @@ function executeQuery($dbQuery, $dbConnect, $autoClose = true): array
 {
     $dbQueryResult = mysqli_query($dbConnect, $dbQuery);
     if ($dbQueryResult === false) {
-        throw new \Exception();
+        throw new \Exception("Error on DbQuery ${dbQuery}");
     }
     if ($autoClose) {
         mysqli_close($dbConnect);
     } else {
         return [];
     }
-    return $dbQueryResult ? mysqli_fetch_all($dbQueryResult, MYSQLI_ASSOC) : [];
+    return gettype($dbQueryResult) !== 'boolean' && $dbQueryResult ? mysqli_fetch_all($dbQueryResult, MYSQLI_ASSOC) : [];
 }

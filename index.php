@@ -2,8 +2,17 @@
     require $_SERVER['DOCUMENT_ROOT'] . '/config.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/include/constants.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/db.php';
+    require $_SERVER['DOCUMENT_ROOT'] . '/include/dataAccess/root.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/include/functions.php';
     require $_SERVER['DOCUMENT_ROOT'] . '/routes.php';
+    require $_SERVER['DOCUMENT_ROOT'] . '/include/controllers/controller.php';
+
+    ini_set('date.timezone', 'Europe/Moscow');
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    ini_set('log_errors', 'on');
+    ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/project.err');
 
     $route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $urlParts = array_values(array_filter(explode('/', $route), function($elm){ return !empty($elm); }));

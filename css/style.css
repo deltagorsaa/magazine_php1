@@ -109,10 +109,13 @@ a {
       width: 145px; }
     .custom-form__input--error {
       border-color: #ED465A; }
-    .custom-form__input:hover {
+    .custom-form__input:enabled:hover {
       border-color: #25A4CC; }
-    .custom-form__input:focus {
+    .custom-form__input:enabled:focus {
       border-color: #393939; }
+    .custom-form__input:disabled {
+      background-color: #c3c3c3;
+    }
       .custom-form__input:focus + .custom-form__input-label {
         visibility: hidden; }
   .custom-form__input-wrapper {
@@ -937,4 +940,13 @@ a {
   align-self: flex-end;
   transform: translateX(-20px) rotate(45deg);
   transform-origin: 100% 0%;
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.auth-error {
+  color: red;
+  font-weight: bold;
 }
